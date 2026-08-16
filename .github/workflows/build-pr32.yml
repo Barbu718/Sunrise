@@ -13,18 +13,17 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup CMake 3.31
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: "3.31.0"
-
-      - name: Configure
-        shell: pwsh
-        run: cmake -S . -B out/build -A x64
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build Release
         shell: pwsh
-        run: cmake --build out/build --config Release --target steam_api64
+        run: msbuild Sunrise.sln /m /p:Configuration=Release /p:Platform=x64
+
+      - name: Verify DLL
+        shell: pwsh
+        run: |
+          Get-Item build/x64/Release/steam_api64.dll
 
       - name: Upload DLL artifact
         uses: actions/upload-artifact@v4
